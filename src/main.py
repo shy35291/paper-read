@@ -1,7 +1,4 @@
 from pathlib import Path
-
-from pyexpat import features
-
 import reader
 import statistics
 import keywords
