@@ -3,8 +3,9 @@ import reader
 import statistics
 import keywords
 import writer
-
-path=Path('../papers')
+  
+BASE_DIR = Path(__file__).resolve().parent.parent
+path = BASE_DIR / "papers"
 report={}
 for filename in path.glob('*.txt'):
     text=reader.readtext(filename)
