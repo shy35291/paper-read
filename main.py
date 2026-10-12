@@ -1,11 +1,9 @@
 from pathlib import Path
-import reader
-import statistics
-import keywords
-import writer
+from src import reader, statistics, keywords, writer
   
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 path = BASE_DIR / "papers"
+print(path)
 report={}
 for filename in path.glob('*.txt'):
     text=reader.readtext(filename)
@@ -24,4 +22,3 @@ for filename in path.glob('*.txt'):
                            "filesize":filesize,
                            "top10":top10}
 writer.write(report)
-
