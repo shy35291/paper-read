@@ -6,3 +6,12 @@ __pycache__/
 dist/
 build/
 .env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+output/
+.pytest_cache/
+.coverage
+*.log
+.DS_Store
+Thumbs.db
