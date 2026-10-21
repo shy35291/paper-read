@@ -1,24 +1,51 @@
+
 from pathlib import Path
 from src import reader, statistics, keywords, writer
-  
+from src.llm import analyze_paper
+
 BASE_DIR = Path(__file__).resolve().parent
-path = BASE_DIR / "papers"
-print(path)
-report={}
-for filename in path.glob('*.txt'):
-    text=reader.readtext(filename)
-    words=statistics.count_words(text)              #单词数
+PAPERS_DIR = BASE_DIR / "papers"
 
-    prographs=statistics.count_prographs(text)      # 段落数
+report = {}
 
-    filesize=statistics.size_file(filename)         # 计算文件大小,以字节为单位
+# 同时读取 TXT 和 PDF 文件
+for filename in sorted(PAPERS_DIR.iterdir()):
 
-    language_type=keywords.language(text)           #判断文献语言类型
+    if not filename.is_file():
+        continue
 
-    top10=keywords.get_keywords(language_type,text) #获取关键词
-    # 保存结果
-    report[filename.stem]={"words":words,
-                           "prographs":prographs,
-                           "filesize":filesize,
-                           "top10":top10}
+    suffix = filename.suffix.lower()
+
+    if suffix == ".txt":
+        text = reader.read_text(filename)
+    elif suffix == ".pdf":
+        text = reader.read_pdf(filename)
+    else:
+        continue
+
+    # AI 论文分析
+    result = analyze_paper(text)
+
+    # 原有统计流程
+    words = statistics.count_words(text)
+    paragraphs = statistics.count_prographs(text)
+    filesize = statistics.size_file(filename)
+
+    language_type = keywords.language(text)
+    top10 = keywords.get_keywords(language_type, text)
+
+    # 将每篇论文的 AI 分析与统计结果一起保存
+    report[filename.stem] = {
+        "words": words,
+        "paragraphs": paragraphs,
+        "filesize": filesize,
+        "top10": top10,
+        "analysis": result,
+    }
+
+    print(f"已处理：{filename.name}")
+
+# 保存全部论文的分析结果
 writer.write(report)
+
+print(f"分析完成，共处理 {len(report)} 个文件。")
